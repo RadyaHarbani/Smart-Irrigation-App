@@ -33,6 +33,7 @@ class CalendarView extends GetView<CalendarController> {
         onAccept: (plant) => controller.addEvent(date, slot, plant),
         builder: (_, __, ___) {
           return Container(
+            constraints: BoxConstraints(minHeight: cellHeight),
             margin: EdgeInsets.all(cellWidth * 0.05),
             padding: EdgeInsets.all(cellWidth * 0.08),
             decoration: BoxDecoration(
@@ -40,30 +41,36 @@ class CalendarView extends GetView<CalendarController> {
               borderRadius: BorderRadius.circular(cellWidth * 0.15),
               border: Border.all(color: Colors.grey.shade300),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ...events.map(
-                  (e) => GestureDetector(
-                    onTap: () => controller.removeEvent(date, slot, e),
-                    child: Container(
-                      margin: EdgeInsets.symmetric(vertical: cellHeight * 0.02),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: cellWidth * 0.1,
-                        vertical: cellHeight * 0.02,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green.shade200,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        e,
-                        style: GoogleFonts.poppins(fontSize: cellWidth * 0.12),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...events.map(
+                    (e) => GestureDetector(
+                      onTap: () => controller.removeEvent(date, slot, e),
+                      child: Container(
+                        margin: EdgeInsets.symmetric(
+                          vertical: cellHeight * 0.02,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: cellWidth * 0.1,
+                          vertical: cellHeight * 0.02,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade200,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          e,
+                          style: GoogleFonts.poppins(
+                            fontSize: cellWidth * 0.12,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -78,9 +85,13 @@ class CalendarView extends GetView<CalendarController> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final cellWidth = (screenWidth * 0.22).clamp(70.0, 110.0);
-    final rowHeight = (screenHeight * 0.13).clamp(90.0, 130.0);
-    final maeWidth = (screenWidth * 0.12).clamp(40.0, 60.0);
+    final isTablet = screenWidth >= 600;
+
+    final cellWidth = isTablet ? (screenWidth * 0.12) : (screenWidth * 0.22);
+
+    final rowHeight = isTablet ? (screenHeight * 0.12) : (screenHeight * 0.13);
+
+    final maeWidth = isTablet ? (screenWidth * 0.08) : (screenWidth * 0.12);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7F5),
@@ -92,7 +103,7 @@ class CalendarView extends GetView<CalendarController> {
             Text(
               "Jadwal Penyiraman",
               style: GoogleFonts.poppins(
-                fontSize: screenWidth * 0.06,
+                fontSize: isTablet ? 28 : screenWidth * 0.06,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -100,9 +111,11 @@ class CalendarView extends GetView<CalendarController> {
             SizedBox(height: screenHeight * 0.015),
 
             Padding(
-              padding: EdgeInsets.only(left: screenWidth * 0.05),
+              padding: isTablet
+                  ? EdgeInsets.only(left: screenWidth * 0.325)
+                  : EdgeInsets.only(left: screenWidth * 0.05),
               child: SizedBox(
-                height: screenHeight * 0.08,
+                height: isTablet ? 80 : 60,
                 child: Obx(
                   () => ListView.builder(
                     scrollDirection: Axis.horizontal,
@@ -112,7 +125,9 @@ class CalendarView extends GetView<CalendarController> {
 
                       return Padding(
                         padding: EdgeInsets.symmetric(
-                          horizontal: screenWidth * 0.02,
+                          horizontal: isTablet
+                              ? screenWidth * 0.005
+                              : screenWidth * 0.02,
                         ),
                         child: Draggable<String>(
                           data: plant,
@@ -154,7 +169,7 @@ class CalendarView extends GetView<CalendarController> {
                       child: Text(
                         controller.monthYear,
                         style: GoogleFonts.poppins(
-                          fontSize: screenWidth * 0.045,
+                          fontSize: isTablet ? 20 : screenWidth * 0.045,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -181,12 +196,9 @@ class CalendarView extends GetView<CalendarController> {
                           height: rowHeight,
                           width: maeWidth,
                           child: Center(
-                            child: Text(
-                              controller.getSlotLabel(slot),
-                              style: GoogleFonts.poppins(
-                                fontSize: maeWidth * 0.4,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Icon(
+                              controller.getSlotIcon(slot),
+                              size: maeWidth * 0.5,
                             ),
                           ),
                         ),
@@ -261,7 +273,7 @@ class CalendarView extends GetView<CalendarController> {
                 padding: EdgeInsets.only(right: screenWidth * 0.02),
                 child: SvgPicture.asset(
                   "assets/icon/tumbuhan.svg",
-                  height: screenHeight * 0.2,
+                  height: isTablet ? 180 : screenHeight * 0.2,
                 ),
               ),
             ),

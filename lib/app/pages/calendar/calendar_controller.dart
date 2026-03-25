@@ -1,41 +1,33 @@
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
 enum TimeSlot { morning, afternoon, evening }
 
 class CalendarController extends GetxController {
   var currentDate = DateTime.now().obs;
 
-  var plants = <String>[
-    '🌶 Chili',
-    '🥬 Vegetables',
-    '🍅 Tomato',
-  ].obs;
+  var plants = <String>['🌶 Chili', '🥬 Vegetables', '🍅 Tomato'].obs;
 
   var events = <String, List<String>>{}.obs;
 
-  String get monthYear =>
-      DateFormat('MMMM yyyy').format(currentDate.value);
+  String get monthYear => DateFormat('MMMM yyyy').format(currentDate.value);
 
-  int get daysInMonth {
-    final nextMonth =
-        DateTime(currentDate.value.year, currentDate.value.month + 1, 1);
-    return nextMonth.subtract(const Duration(days: 1)).day;
-  }
+  int get daysInMonth => 7;
 
   String _key(DateTime date, TimeSlot slot) {
     final dateStr = DateFormat('yyyy-MM-dd').format(date);
     return "$dateStr-${slot.name}";
   }
 
-  String getSlotLabel(TimeSlot slot) {
+  IconData getSlotIcon(TimeSlot slot) {
     switch (slot) {
       case TimeSlot.morning:
-        return "M";
+        return Icons.wb_sunny;
       case TimeSlot.afternoon:
-        return "A";
+        return Icons.wb_cloudy;
       case TimeSlot.evening:
-        return "E";
+        return Icons.nightlight_round;
     }
   }
 
@@ -67,12 +59,16 @@ class CalendarController extends GetxController {
   }
 
   void nextMonth() {
-    currentDate.value =
-        DateTime(currentDate.value.year, currentDate.value.month + 1);
+    currentDate.value = DateTime(
+      currentDate.value.year,
+      currentDate.value.month + 1,
+    );
   }
 
   void prevMonth() {
-    currentDate.value =
-        DateTime(currentDate.value.year, currentDate.value.month - 1);
+    currentDate.value = DateTime(
+      currentDate.value.year,
+      currentDate.value.month - 1,
+    );
   }
 }
